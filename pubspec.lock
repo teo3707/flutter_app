@@ -83,6 +83,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_configuration:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "1c7733fbacb29a0771a0fbbe873329785f8fc2c2"
+      url: "https://github.com/teo3707/flutter_configuration.git"
+    source: git
+    version: "0.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -249,6 +258,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.29.0+1"
+  shared_preferences:
+    dependency: "direct main"
+    description:
+      name: shared_preferences
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.2"
   shelf:
     dependency: transitive
     description:
@@ -382,3 +398,4 @@ packages:
     version: "2.1.14"
 sdks:
   dart: ">=2.0.0-dev.62.0 <=2.0.0-edge.3c4dccbd46f152be9e1b6ca95c57357e8e48057c"
+  flutter: ">=0.1.4 <2.0.0"
