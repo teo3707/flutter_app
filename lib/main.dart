@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'i18n/i18n.dart';
+import 'components/components.dart';
 
 void main() {
   I18n i18n = I18n();
@@ -20,6 +21,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  final GlobalKey<AnimatedComponentsState> animatedComponents = GlobalKey<AnimatedComponentsState>();
+  bool showBegin = true;
+  double animatedValue = 0.0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -36,26 +41,38 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text("Test")),
     body: Center(
-      child: FlatButton(
-        child: Icon(Icons.language),
-        onPressed: () async {
-          print('waiting');
-          print(await settingLanguage(context));
-        },
-      ),
+      child: Column(
+        children: <Widget>[
+          FlatButton(
+            child: Icon(Icons.language),
+            onPressed: () async {
+              print('waiting');
+              print(await settingLanguage(context));
+            },
+          ),
+          Text('$animatedValue')
+        ],
+      )
     ),
     floatingActionButton: FloatingActionButton(
-      child: Icon(Icons.date_range),
+      child: AnimatedComponents(
+        begin: Icon(Icons.home),
+        end: Icon(Icons.close),
+        key: animatedComponents,
+        listener: (AnimationController controller) {
+          animatedValue = controller.value;
+          setState(() {
+
+          });
+        },
+      ),
       onPressed: () {
-        String a;
-        print(a == null);
-//        showDatePicker(
-//          context: context,
-//          initialDate: DateTime.now(),
-//          firstDate: DateTime(1991),
-//          lastDate: DateTime(2099),
-//        );
-        showTimePicker(context: context, initialTime: TimeOfDay(hour: 10, minute: 5));
+        showBegin = !showBegin;
+        if (!showBegin) {
+          animatedComponents.currentState.forward();
+        } else {
+          animatedComponents.currentState.reverse();
+        }
       },
     ),
   );
