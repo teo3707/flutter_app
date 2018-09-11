@@ -1,17 +1,36 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'i18n/i18n.dart';
-import 'components/components.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  I18n i18n = I18n();
 
-  runApp(
-    createI18nApp(
-      title: (_) => i18n.T('app_title'),
-      child: (_) => MyApp(),
-    )
-  );
+void main() async {
+  // get system default language
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String defaultLanguage = prefs.getString("__sys_store_language");
+
+  if (defaultLanguage == null || defaultLanguage.isEmpty) {
+    defaultLanguage = await findSystemLocale();
+    if (!I18n.isSupported(defaultLanguage)) {
+      defaultLanguage = I18n.getAllLanguages()[0];
+    }
+    I18n().language = defaultLanguage;
+    prefs.setString('__sys_store_language', defaultLanguage);
+  }
+
+
+  runApp(MaterialApp(
+    title: "Title",
+    localizationsDelegates: [
+      I18nLocalizations.delegate,
+    ],
+    supportedLocales: [
+      const Locale(I18nLocalizationsDelegate.languageCode)
+    ],
+    home: MyApp(),
+  ));
 }
+
 
 class MyApp extends StatefulWidget {
   @override
@@ -21,60 +40,27 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  final GlobalKey<AnimatedComponentsState> animatedComponents = GlobalKey<AnimatedComponentsState>();
-  bool showBegin = true;
-  double animatedValue = 0.0;
+  String defaultLanguage;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    I18n i18n = I18n();
-    i18n.addTransDict({
-      'app_title': {
-        'zh': '标题'
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text("Test")),
     body: Center(
-      child: Column(
-        children: <Widget>[
-          FlatButton(
-            child: Icon(Icons.language),
-            onPressed: () async {
-              print('waiting');
-              print(await settingLanguage(context));
-            },
-          ),
-          Text('$animatedValue')
-        ],
-      )
+      child: Text(I18n().T('languageSetting')),
     ),
     floatingActionButton: FloatingActionButton(
-      child: AnimatedComponents(
-        begin: Icon(Icons.home),
-        end: Icon(Icons.close),
-        key: animatedComponents,
-        listener: (AnimationController controller) {
-          animatedValue = controller.value;
-          setState(() {
-
-          });
-        },
-      ),
       onPressed: () {
-        showBegin = !showBegin;
-        if (!showBegin) {
-          animatedComponents.currentState.forward();
-        } else {
-          animatedComponents.currentState.reverse();
-        }
+        settingLanguage(
+          context: context,
+          currentLanguage: defaultLanguage,
+        );
       },
+      child: Icon(Icons.language),
     ),
   );
 }
-
