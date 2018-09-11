@@ -3,205 +3,15 @@ library com.newt.i18n;
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_configuration/flutter_configuration.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'strings/strings.dart' as strings;
 
-
-part 'app.dart';
-
-
-String _lang;
+part 'settings.dart';
 
 class I18n {
 
-  Map<String, Map<String, String>> _transDict = {
-    // I18n delegate
-    '__openAppDrawerTooltip': {
-      'en': 'Open navigation menu',
-      'zh': '打开Drawer'
-    },
+  String language;
 
-    '__backButtonTooltip': {
-      'en': 'Back',
-      'zh': '后退'
-    },
-
-    '__closeButtonTooltip': {
-      'en': 'Close',
-      'zh': '关闭'
-    },
-
-    '__deleteButtonTooltip': {
-      'en': 'Delete',
-      'zh': '删除'
-    },
-
-    '__nextMonthTooltip': {
-      'en': 'Next month',
-      'zh': '下个月'
-    },
-
-    '__previousMonthTooltip': {
-      'en': 'Previous month',
-      'zh': '上个月'
-    },
-
-    '__nextPageTooltip': {
-      'en': 'Next page',
-      'zh': '下一页'
-    },
-
-    '__previousPageTooltip': {
-      'en': 'Previous page',
-      'zh': '上一页'
-    },
-
-    '__showMenuTooltip': {
-      'en': 'Show menu',
-      'zh': '打开菜单'
-    },
-
-    '__drawerLabel': {
-      'en': 'Navigation menu',
-      'zh': 'Nav菜单'
-    },
-
-    '__popupMenuLabel': {
-      'en': 'Popup menu',
-      'zh': 'Popup菜单'
-    },
-
-    '__dialogLabel': {
-      'en': 'Dialog',
-      'zh': '对话框'
-    },
-
-    '__alertDialogLabel': {
-      'en': 'Alert',
-      'zh': '警告框'
-    },
-
-    '__about': {
-      'en': 'About',
-      'zh': '关于'
-    },
-
-    '__licensesPageTitle': {
-      'en': 'Licenses',
-      'zh': '授权'
-    },
-
-    '__pageRowsInfoTitle_of': {
-      'en': 'of',
-      'zh': '共'
-    },
-
-    '__pageRowsInfoTitle_of_about': {
-      'en': 'of about',
-      'zh': '大约'
-    },
-
-    '__rowsPerPageTitle': {
-      'en': 'Rows per page:',
-      'zh': '每页显示:'
-    },
-
-    '__cancelButtonLabel': {
-      'en': 'CANCEL',
-      'zh': '取消'
-    },
-
-    '__continueButtonLabel': {
-      'en': 'CONTINUE',
-      'zh': '继续'
-    },
-
-    '__copyButtonLabel': {
-      'en': 'COPY',
-      'zh': '复制'
-    },
-
-    '__cutButtonLabel': {
-      'en': 'CUT',
-      'zh': '剪切'
-    },
-
-    '__okButtonLabel': {
-      'en': 'OK',
-      'zh': '确定'
-    },
-
-    '__pasteButtonLabel': {
-      'en': 'PASTE',
-      'zh': '粘贴'
-    },
-
-    '__selectAllButtonLabel': {
-      'en': 'SELECT ALL',
-      'zh': '全选'
-    },
-
-    '__viewLicensesButtonLabel': {
-      'en': 'VIEW LICENSES',
-      'zh': '查看授权'
-    },
-
-    '__anteMeridiemAbbreviation': {
-      'en': 'AM',
-      'zh': '上午'
-    },
-
-    '__postMeridiemAbbreviation': {
-      'en': 'PM',
-      'zh': '下午'
-    },
-
-    '__timePickerHourModeAnnouncement': {
-      'en': 'Select hours',
-      'zh': '选择小时'
-    },
-
-    '__timePickerMinuteModeAnnouncement': {
-      'en': 'Select minutes',
-      'zh': '选择分钟'
-    },
-
-    '__modalBarrierDismissLabel': {
-      'en': 'Dismiss',
-      'zh': 'DISMISS'
-    },
-
-    '__signedInLabel': {
-      'en': 'Sigend in',
-      'zh': '注册'
-    },
-
-    '__hideAccountsLabel': {
-      'en': 'Hide accounts',
-      'zh': '隐藏账户',
-    },
-
-    '__showAccountsLabel': {
-      'en': 'Show accounts',
-      'zh': '显示账户'
-    },
-
-    'app_setting_language_label': {
-      'en': 'Setting Language',
-      'zh': '语言设置'
-    },
-
-    // configure here
-    'app_title': {
-      'en': 'flutter demo',
-      'zh': 'flutter demo.'
-    },
-
-    'app_name': {
-      'en': 'flutter',
-      'zh': 'Flutter'
-    }
-  };
+  Map<String, Map<String, String>> _transDict = strings.STRINGS;
 
   static final I18n _instance = new I18n._internal();
 
@@ -212,9 +22,11 @@ class I18n {
 
   I18n._internal();
 
-  bool isSupported(String languageCode) {
-    return ['en', 'zh'].contains(languageCode);
+  static bool isSupported(String languageCode) {
+    return languageCode != null && strings.LANGUAGES.contains(languageCode);
   }
+
+  static List<String> getAllLanguages() => strings.LANGUAGES;
 
   List<Map<String, String>> getSupportedLanguages() {
     return <Map<String, String>>[
@@ -248,13 +60,16 @@ class I18n {
   }
 
   String T(String key, { String lang }) {
-    // _lang inject by I18nApp
-    if (_lang == "") {
-      print('make sure your app root is I18nApp');
+    if (language == null || language.isEmpty) {
+      print('please set: i18n.language = ...');
     }
 
     if (lang == null) {
-      lang = _lang?? 'en';
+      lang = language;
+    }
+
+    if (!isSupported(lang)) {
+      lang = strings.LANGUAGES[0];
     }
 
     try {
@@ -277,9 +92,9 @@ class I18n {
 }
 
 
-class _I18nLocalizations implements MaterialLocalizations {
+class I18nLocalizations implements DefaultMaterialLocalizations {
 
-  const _I18nLocalizations();
+  const I18nLocalizations();
 
   static const List<String> _shortWeekdays = const <String>[
     'Mon',
@@ -345,9 +160,9 @@ class _I18nLocalizations implements MaterialLocalizations {
   static I18n _i18n = I18n();
 
   static Future<MaterialLocalizations> load(Locale locale) =>
-      SynchronousFuture<MaterialLocalizations>(const _I18nLocalizations());
+      SynchronousFuture<MaterialLocalizations>(const I18nLocalizations());
 
-  static const LocalizationsDelegate<MaterialLocalizations> delegate = const _I18nLocalizationsDelegate();
+  static const LocalizationsDelegate<MaterialLocalizations> delegate = const I18nLocalizationsDelegate();
 
   @override
   String aboutListTileTitle(String applicationName) => '${_i18n.T("__about")} $applicationName';
@@ -600,30 +415,24 @@ class _I18nLocalizations implements MaterialLocalizations {
   @override
   String get viewLicensesButtonLabel => _i18n.T('__viewLicensesButtonLabel');
 
-
-
+  @override
+  String get searchFieldLabel => _i18n.T('__Search');
 }
 
 
-class _I18nLocalizationsDelegate extends LocalizationsDelegate<MaterialLocalizations> {
+class I18nLocalizationsDelegate extends LocalizationsDelegate<MaterialLocalizations> {
 
   static const languageCode = 'com.newt.not.exist';
 
-  const _I18nLocalizationsDelegate();
+  const I18nLocalizationsDelegate();
 
 
   @override
   bool isSupported(Locale locale) => locale.languageCode == languageCode;
 
   @override
-  Future<MaterialLocalizations> load(Locale locale) => _I18nLocalizations.load(locale);
+  Future<MaterialLocalizations> load(Locale locale) => I18nLocalizations.load(locale);
 
   @override
-  bool shouldReload(_I18nLocalizationsDelegate old) => false;
+  bool shouldReload(I18nLocalizationsDelegate old) => false;
 }
-
-
-Widget createI18nApp({GenValueByLang<String> title, GenValueByLang<Widget> child}) => I18nApp(
-  title: title,
-  child: child,
-);
