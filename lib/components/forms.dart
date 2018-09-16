@@ -61,7 +61,7 @@ class EditForm extends StatefulWidget {
 
 class _EditFromState extends State<EditForm> {
 
-  Widget _buildField(Map field, TextInputType type, {bool last}) {
+  Widget _buildField(Map field, TextInputType type, {bool last = false}) {
     /// binding text editing controller, focus node, auto validate
     field['__textEditingController'] = field['textEditingController']??
         TextEditingController(
@@ -84,7 +84,7 @@ class _EditFromState extends State<EditForm> {
     });
 
     // for password
-    field['__type'] = field['type'];
+    field['__obscure'] = field['__obscure']?? field['type'] == FieldType.password;
 
     return TextFormField(
       controller: field['__textEditingCOntroller'],
@@ -96,7 +96,7 @@ class _EditFromState extends State<EditForm> {
       focusNode: field['__focusNode'],
       // inputFormatters: ...,
       enabled: field['enabled']?? true,
-      obscureText: field['__type'] == FieldType.password,
+      obscureText: field['__obscure'],
       decoration: InputDecoration(
         border: field['inputBorder']?? widget.config.inputBorder,
         prefix: field['prefix'],
@@ -109,12 +109,12 @@ class _EditFromState extends State<EditForm> {
           if (field['type'] == FieldType.password) {
             var icons = field['suffixIcon'];
             return InkWell(
-              child: field['__type'] == null
-                ? (icons == null ? Icon(Icons.visibility_off) : icons[1])
-                : (icons == null ? Icon(Icons.visibility) : icons[0]),
+              child: field['__obscure']
+                ? (icons == null ? Icon(Icons.visibility) : icons[0])
+                : (icons == null ? Icon(Icons.visibility_off) : icons[1]),
               onTap: () {
                 setState(() {
-                  field['__type'] = null;
+                  field['__obscure'] = !field['__obscure'];
                 });
               },
             );
@@ -148,17 +148,23 @@ class _EditFromState extends State<EditForm> {
       }
 
       switch (field['type']) {
+        case FieldType.password:
         case FieldType.text:
+          widgets.add(_buildField(field, TextInputType.text));
           break;
 
         case FieldType.number:
       }
     }
+
+    return Column(
+      children: widgets,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return null;
+    return _buildFields();
   }
 }

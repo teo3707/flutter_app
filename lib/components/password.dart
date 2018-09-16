@@ -124,15 +124,12 @@ class PasswordState extends State<Password> {
       width: _kStrokeWidth,
     );
 
-    Widget passwordArea = SizedBox(
+    Widget passwordArea = Container(
+      width: MediaQuery.of(context).size.width,
       height: _kSize,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: _kHorizontalPadding,
-          right: _kHorizontalPadding,
-        ),
         child: Center(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(widget.count, (index) {
               return Container(
                 height: size,
@@ -168,7 +165,6 @@ class PasswordState extends State<Password> {
             })
           ),
         ),
-      ),
     );
 
     return Column(
@@ -176,15 +172,16 @@ class PasswordState extends State<Password> {
         passwordArea,
         SizedBox(height: _kHorizontalPadding * 2,),
         _buildKeyboard(),
+        Container(
+          height: 250.0,
+          color: Colors.red,
+        )
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: _buildDisplay(),
-    );
+    return _buildDisplay();
   }
 }
