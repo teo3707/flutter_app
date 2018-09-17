@@ -1,6 +1,9 @@
 library com.newt.utils;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'dart:async';
 export 'dialog.dart';
 
@@ -128,4 +131,53 @@ class _PersistentModalBottomSheetLayout extends SingleChildLayoutDelegate {
   bool shouldRelayout(_PersistentModalBottomSheetLayout oldDelegate) {
     return progress != oldDelegate.progress;
   }
+}
+
+
+Future<void> showLoading({
+  @required BuildContext context,
+  Completer<void> completer,
+  bool barrierDismissible = false,
+  Widget content = const Center(
+    child: CupertinoActivityIndicator(),
+  ),
+}) async {
+  Widget widget = AnimatedPadding(
+    padding: MediaQuery.of(context).viewInsets + const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    duration: Duration(milliseconds: 300),
+    curve: Curves.easeOut,
+    child: new MediaQuery.removeViewInsets(
+      removeLeft: true,
+      removeTop: true,
+      removeRight: true,
+      removeBottom: true,
+      context: context,
+      child: content,
+    ),
+  );
+
+  if (completer != null) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context){
+        Timer(Duration(milliseconds: 0), () {
+          completer.future.then((_) {
+            Navigator.of(context).pop();
+          });
+        });
+        return WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: widget,
+        );
+      }
+    );
+  }
+  return showDialog(
+    context: context,
+    barrierDismissible: barrierDismissible,
+    builder: (context) => widget,
+  );
 }
